@@ -14,11 +14,11 @@ Controller:
 
 ````shell
 
-package com.aedemirsen.springboot_mongodb.controller;
+package com.ffx.springboot_mongodb.controller;
 
-import com.aedemirsen.springboot_mongodb.dto.StudentDto;
-import com.aedemirsen.springboot_mongodb.mapper.IStudentMapper;
-import com.aedemirsen.springboot_mongodb.service.interfaces.IStudentService;
+import com.ffx.springboot_mongodb.dto.StudentDto;
+import com.ffx.springboot_mongodb.mapper.IStudentMapper;
+import com.ffx.springboot_mongodb.service.interfaces.IStudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -64,11 +64,11 @@ Lets see StudentService class:
 
 ````shell
 
-package com.aedemirsen.springboot_mongodb.service.impl;
+package com.ffx.springboot_mongodb.service.impl;
 
-import com.aedemirsen.springboot_mongodb.document.Student;
-import com.aedemirsen.springboot_mongodb.repository.IStudentRepository;
-import com.aedemirsen.springboot_mongodb.service.interfaces.IStudentService;
+import com.ffx.springboot_mongodb.document.Student;
+import com.ffx.springboot_mongodb.repository.IStudentRepository;
+import com.ffx.springboot_mongodb.service.interfaces.IStudentService;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -157,7 +157,10 @@ GlobalExceptionHandler
 
 To solve this problem, we will create a class and with @ControllerAdvice annotation we will make it listen for exceptions thrown from all controller classes in our spring project.
 
-package com.aedemirsen.springboot_mongodb.exception;
+
+````shell
+
+package com.ffx.springboot_mongodb.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -184,6 +187,10 @@ public class GlobalExceptionHandler {
                 .body(exception.getMessage());
     }
 }
+
+````
+
+
 The above structure will provide this process with basic principles. In a nutshell, this is where exceptions of the specified types are thrown, where they will be caught, and error messages specified by the developer will be delivered to the client.
 
 Now let’s perform a test and query a student who is not in the database with his/her ID:
