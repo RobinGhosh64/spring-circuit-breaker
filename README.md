@@ -4,7 +4,7 @@
 **Overview**: 
 
 - [Requirements](#requirements)
-- [What is a circuit breaker pattern](#step-1-whatis-circuit-breaker-pattern)
+- [What is a circuit breaker pattern](#what-is-a-circuit-breaker-pattern)
 - [Step 2: Create an Azure Resource Group ](#step-2-create-an-azure-resource-group)
 - [Step 3: Create Cosmos DB resources](#step-3-create-cosmos-db-resources)
 - [Step 4: Create Function App](#step-4-create-function-app)
@@ -59,7 +59,7 @@ Micro services are the most important implementation aspect used in the industry
 
 These micro service patterns were further broken down into several categories, considering their scopes. Among all these patterns, there are some very important and popular patterns used by so many developers. Circuit Breaker is one of them which helps to manage downstream service failures in a proper manner. Let’s understand what this pattern does. 💪
 
-What is Circuit Breaker Pattern?
+## What is Circuit Breaker Pattern?
 You may have already heard of circuit breakers we find in electronic items. What is the main purpose of it? Simply, break the electric flow in an unexpected scenario. Same as that, here also this micro service pattern has go the name due to the same nature it has.
 
 This pattern comes into the picture while communicating between services. Let’s take a simple scenario. Let’s say we have two services: Service A and B. Service A is calling Service B(API call) to get some information needed. When Service A is calling to Service B, if Service B is down due to some infrastructure outage, what will happen? Service A is not getting a result and it will be hang by throwing an exception. Then another request comes and it also faces the same situation. Like this request threads will be blocked/hanged until Service B is coming up! As a result, the network resources will be exhausted with low performance and bad user experience. Cascading failures also can happen due to this.
