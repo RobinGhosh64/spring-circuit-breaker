@@ -144,9 +144,10 @@ public class RateController {
         return ResponseEntity.ok().body(rateService.getRateByType(type));
     }
 }
-
 ```
+
 Service:
+
 ````shell
 
 @Service
@@ -160,6 +161,7 @@ public class RateService {
     }
 }
 ```
+
 Repository:
 
 ````shell
@@ -184,8 +186,8 @@ public class Rate {
     @Column(name = "rate")
     Double rateValue;
 }
-
 ```
+
 Configuration:
 ````shell
 
