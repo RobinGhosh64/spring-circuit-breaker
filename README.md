@@ -135,7 +135,9 @@ I will make a call to Rate service from Loan service requesting the interest rat
 Since rate-service is independent, I will first implement basic functionalities for the rate-service.
 Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as rate-service.
 
-https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml
+https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml](https://github.com/RobinGhosh64/spring-circuit-breaker/blob/main/rate-service/pom.xml
+
+
 Controller:
 
 
@@ -143,7 +145,8 @@ Controller:
 
 @RestController
 @RequestMapping("api")
-public class RateController {
+public class RateControl
+ler {
 
     @Autowired
     private RateService rateService;
@@ -286,12 +289,15 @@ Now we can start rate-service and see check the API we need. Go to http://localh
 
 Now I need to implement loan-service. The circuit breaker is needed inside loan-service since it’s calling to rate-service. Therefore, Resilience4j library is needed. And I need to check the status of the breaker. For that, I need Actuator enabled in the loan-service.
 
-Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as loan-service.
+Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as loan-service.
+
+https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml](https://github.com/RobinGhosh64/spring-circuit-breaker/blob/main/rate-service/pom.xml
 
 
 Let’s add basic functionalities for the loan-service.
 
 
+Controller:
 
 ````shell
 
@@ -491,7 +497,8 @@ Now we can start rate-service and see check the API we need. Go to http://localh
 [
 {"id": 1,"type": "PERSONAL","amount": 200000,"interest": 20000},    {"id": 3,"type": "PERSONAL","amount": 100000,"interest": 10000}
 ]
-Enable Circuit Breaker with fallback method 💥
+
+## Enable Circuit Breaker with fallback method 💥
 Now we have to enrich our Loan service method with an annotation. It is called “@CircuitBreaker”. Here, SERVICE_NAME is taken as “loan-service”. Then we have to provide a fallbackMethod. The purpose of that is to call it by default when the downstream service(rate-service) is failing to respond.
 
 
@@ -521,7 +528,7 @@ public List<Loan> getDefaultLoans(Exception e) {
 
 ````
 
-Add Circuit Breaker Configs 💥
+## Add Circuit Breaker Configs 💥
 Let’s add Resilience4j circuit breaker configurations. Add this to application.yml in loan-service.
 
 
