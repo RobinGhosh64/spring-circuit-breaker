@@ -128,8 +128,24 @@ Loan service can fetch Loans saved in DB and each loan object has loan type. The
 
 I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
 
-
 Controller:
+
+
+````shell
+
+module.exports = async function (context, req) {
+    context.log('JavaScript HTTP trigger function processed a request.');
+
+    context.res = {
+        // status: 200, /* Defaults to 200 */
+        body: context.bindings.inputDocument
+    };
+}
+
+````
+
+RestController
+
 ````shell
 
 @RestController
