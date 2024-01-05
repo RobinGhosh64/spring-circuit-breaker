@@ -153,7 +153,7 @@ public class RateController {
 ````
 
 
-Controller:
+Service:
 
 
 ````shell
@@ -199,9 +199,9 @@ public class Rate {
     Double rateValue;
 }
 
+````
 
-Repository:
-
+Config:
 
 
 ````shell
@@ -286,7 +286,9 @@ Create a new Spring Boot project with the dependencies provided inside below POM
 
 Let’s add basic functionalities for the loan-service.
 
-Controller:
+
+
+````shell
 
 @RestController
 @RequestMapping("api")
@@ -301,7 +303,53 @@ public class LoanController {
     }
 
 }
+
+````
+
+
+Service:
+This is the most important place where we perform the remote call. We need to call this API using RestTemplate: http://localhost:9000/api/rates/{type} in rate service to get the % of the loan type. Then we calculate the interest amount as loan amount * (rate/100) and update loan interest amount.
+
+
+````shell
+
+@Service
+public class LoanService {
+    @Autowired
+    private LoanRepository loanRepository;
+    @Autowired
+    private RestTemplate restTemplate;
+    private static final String SERVICE_NAME = "loan-service";
+    private static final String RATE_SERVICE_URL = "http://localhost:9000/api/rates/";
+    public List<Loan> getAllLoansByType(String type) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<InterestRate> entity = new HttpEntity<>(null, headers);
+        ResponseEntity<InterestRate> response = restTemplate.exchange(
+            (RATE_SERVICE_URL + type),
+            HttpMethod.GET, entity,
+            InterestRate.class
+        );
+        InterestRate rate = response.getBody();
+        List<Loan> loanList = new ArrayList<>();
+        if (rate != null) {
+            loanList = loanRepository.findByType(type);
+            for (Loan loan : loanList) {
+                loan.setInterest(loan.getAmount() * (rate.getRateValue() / 100));
+            }
+        }
+        return loanList;
+    }
+}
+
+
+````
+
 Repository:
+
+
+
+````shell
 
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
     List<Loan> findByType(String type);
@@ -333,67 +381,14 @@ public class Loan {
     Double amount;
     Double interest;
 }
-Entry Point:
 
-Main class will add 3 loan objects when service is coming up. Interest amount has been set as zero since we later update it with the remote call to rate-service.
-We need a Bean of RestTemplate class to perform a remote API call. If you do not know about it, please read about it from here: https://salithachathuranga94.medium.com/rest-template-with-spring-boot-e2001a8219e6
-@SpringBootApplication
-public class LoanServiceApplication {
+````
 
-   @Autowired
-   private LoanRepository loanRepository;
-
-   public static void main(String[] args) {
-      SpringApplication.run(LoanServiceApplication.class, args);
-   }
-
-   @Bean
-   public RestTemplate restTemplate() {
-      return new RestTemplate();
-   }
-
-   @PostConstruct
-   public void setupData() {
-      loanRepository.saveAll(Arrays.asList(
-         Loan.builder().id(1).type("PERSONAL").amount(200000.0).interest(0.0).build(),
-         Loan.builder().id(2).type("HOUSING").amount(6000000.0).interest(0.0).build(),
-         Loan.builder().id(3).type("PERSONAL").amount(100000.0).interest(0.0).build()
-      ));
-   }
-}
-Service:
-
-This is the most important place where we perform the remote call. We need to call this API using RestTemplate: http://localhost:9000/api/rates/{type} in rate service to get the % of the loan type. Then we calculate the interest amount as loan amount * (rate/100) and update loan interest amount.
-
-@Service
-public class LoanService {
-    @Autowired
-    private LoanRepository loanRepository;
-    @Autowired
-    private RestTemplate restTemplate;
-    private static final String SERVICE_NAME = "loan-service";
-    private static final String RATE_SERVICE_URL = "http://localhost:9000/api/rates/";
-    public List<Loan> getAllLoansByType(String type) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<InterestRate> entity = new HttpEntity<>(null, headers);
-        ResponseEntity<InterestRate> response = restTemplate.exchange(
-            (RATE_SERVICE_URL + type),
-            HttpMethod.GET, entity,
-            InterestRate.class
-        );
-        InterestRate rate = response.getBody();
-        List<Loan> loanList = new ArrayList<>();
-        if (rate != null) {
-            loanList = loanRepository.findByType(type);
-            for (Loan loan : loanList) {
-                loan.setInterest(loan.getAmount() * (rate.getRateValue() / 100));
-            }
-        }
-        return loanList;
-    }
-}
 Configuration:
+
+
+````shell
+
 
 server:
   port: 8000
@@ -423,6 +418,84 @@ management:
   health:
     circuitbreakers:
       enabled: true
+
+````
+
+
+
+
+Entry Point: Main class will add 2 types of loan rates when service is coming up.
+
+
+
+
+````shell
+
+@SpringBootApplication
+public class RateServiceApplication {
+
+   @Autowired
+   private RateRepository rateRepository;
+
+   public static void main(String[] args) {
+      SpringApplication.run(RateServiceApplication.class, args);
+   }
+
+   @PostConstruct
+   public void setupData() {
+      rateRepository.saveAll(Arrays.asList(
+         Rate.builder().id(1).type("PERSONAL").rateValue(10.0).build(),
+         Rate.builder().id(2).type("HOUSING").rateValue(8.0).build()
+      ));
+   }
+}
+
+
+
+
+````
+
+
+
+
+Entry Point:
+
+
+
+
+````shell
+
+Main class will add 3 loan objects when service is coming up. Interest amount has been set as zero since we later update it with the remote call to rate-service.
+We need a Bean of RestTemplate class to perform a remote API call. If you do not know about it, please read about it from here: https://salithachathuranga94.medium.com/rest-template-with-spring-boot-e2001a8219e6
+@SpringBootApplication
+public class LoanServiceApplication {
+
+   @Autowired
+   private LoanRepository loanRepository;
+
+   public static void main(String[] args) {
+      SpringApplication.run(LoanServiceApplication.class, args);
+   }
+
+   @Bean
+   public RestTemplate restTemplate() {
+      return new RestTemplate();
+   }
+
+   @PostConstruct
+   public void setupData() {
+      loanRepository.saveAll(Arrays.asList(
+         Loan.builder().id(1).type("PERSONAL").amount(200000.0).interest(0.0).build(),
+         Loan.builder().id(2).type("HOUSING").amount(6000000.0).interest(0.0).build(),
+         Loan.builder().id(3).type("PERSONAL").amount(100000.0).interest(0.0).build()
+      ));
+   }
+}
+
+
+````
+
+
 🔴 I have only allowed actuator to display circuit breaker details. Later we will add the circuit breaker configuration here. For now, it’s not needed.
 
 Now we can start rate-service and see check the API we need. Go to http://localhost:8000/api/loans?type=personal and see the result. You should get this response.
