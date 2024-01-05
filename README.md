@@ -14,11 +14,6 @@
 - [Rate Service](#rate-service)
 - [Loan Service](#loan-service)
 
-
-- [Loan Service calls Rate Service](#loan-service-calls-rate-service)
-- [Normal conditions](#normal-conditions)
-- [Break conditions](#break-conditions)
-- 
 <!-- TOC -->
 
 ## Objectives 
@@ -126,8 +121,14 @@ Spring Boot with H2 in-memory DB, JPA, Hibernate, Actuator, Resilience4j
 Scenario:
 Loan service can fetch Loans saved in DB and each loan object has loan type. There are separate interest rate percentages according to the loan type. So, Rate service is having those Rate object details with it’s name.
 
-I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
 
+Then I have to calculate the total interest value for the loans depending on their loan type.
+
+Then I will update all the Loan objects with the interest amount using the rate I got from Rate service.
+
+I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.
+
+<img src="media/project-setup.png">
 
 ## Rate Service
 
@@ -276,10 +277,6 @@ Now we can start rate-service and see check the API we need. Go to http://localh
 
 {"id": 1,"type": "PERSONAL","rateValue": 10}
 
-Then I have to calculate the total interest value for the loans depending on their loan type.
-Then I will update all the Loan objects with the interest amount using the rate I got from Rate service.
-
-<img src="media/project-setup.png">
 
 
 ## Loan Service
