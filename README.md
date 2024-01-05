@@ -137,8 +137,7 @@ I will make a call to Rate service from Loan service requesting the interest rat
 Since rate-service is independent, I will first implement basic functionalities for the rate-service.
 Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as rate-service.
 
-https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml
-
+https://github.com/RobinGhosh64/spring-circuit-breaker/blob/main/rate-service/pom.xml
 
 Controller:
 
@@ -287,13 +286,24 @@ Now we can start rate-service and see check the API we need. Go to http://localh
 
 
 
+
+````shell
+
+[
+{"id": 1,"type": "PERSONAL","rateValue": 10}
+
+
+````
+
+
+
 ## Loan Service
 
 Now I need to implement loan-service. The circuit breaker is needed inside loan-service since it’s calling to rate-service. Therefore, Resilience4j library is needed. And I need to check the status of the breaker. For that, I need Actuator enabled in the loan-service.
 
 Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as loan-service.
 
-https://github.com/RobinGhosh64/spring-circuit-breaker/loan-service/pom.xml
+https://github.com/RobinGhosh64/spring-circuit-breaker/blob/main/loan-service/pom.xml
 
 Let’s add basic functionalities for the loan-service.
 
@@ -495,9 +505,18 @@ public class LoanServiceApplication {
 
 Now we can start rate-service and see check the API we need. Go to http://localhost:8000/api/loans?type=personal and see the result. You should get this response.
 
+
+
+
+````shell
+
 [
 {"id": 1,"type": "PERSONAL","amount": 200000,"interest": 20000},    {"id": 3,"type": "PERSONAL","amount": 100000,"interest": 10000}
 ]
+
+
+````
+
 
 ## Enable Circuit Breaker with fallback method 💥
 Now we have to enrich our Loan service method with an annotation. It is called “@CircuitBreaker”. Here, SERVICE_NAME is taken as “loan-service”. Then we have to provide a fallbackMethod. The purpose of that is to call it by default when the downstream service(rate-service) is failing to respond.
@@ -597,14 +616,17 @@ Start both services. Now go to loan service actuator URL and see how circuit bre
 
 ````
 
-bufferedCalls —Total API calls from loan-service to rate-service
-failedCalls — Total count of failed API calls from loan-service to rate-service
-failureRate — (failedCalls/bufferedCalls) * 100%
-Test Circuit Breaker 💥
+**bufferedCalls** —Total API calls from loan-service to rate-service
+**failedCalls** — Total count of failed API calls from loan-service to rate-service
+**failureRate** — (failedCalls/bufferedCalls) * 100%
+
+## Test Circuit Breaker## 💥
 We have to follow some ordered steps to see the changes exactly. In each step, we have to see the actuator endpoint and see how circuit breaker is behaving by changing its state. Let’s start!!! 💪
 
 Start both micro services. Loan service is running on 8000 and Rate service is running on 9000. Am i right???
-Now hit this API 2 times: http://localhost:8000/api/loans?type=personal. Then go and check the actuator: http://localhost:8000/actuator/health. Now bufferedCalls count has been updated into 2 as expected. Still breaker is CLOSED since rate service is UP.
+Now hit this API 2 times: http://localhost:8000/api/loans?type=personal
+Then go and check the actuator: http://localhost:8000/actuator/health
+Now bufferedCalls count has been updated into 2 as expected. Still breaker is CLOSED since rate service is UP.
 
 
 
@@ -687,8 +709,9 @@ Then wait for 5 seconds. It should then convert into HALF OPEN state after 5 sec
 
 
 
-Within HALF OPEN state, limited number of requests will be allowed to pass. In our case it is 3 in the configs the relevant value has been set as permittedNumberOfCallsInHalfOpenState: 3.
-Since still rate-service is down, just try loan-service API 3 times again! http://localhost:8000/api/loans?type=personal…What happened? All 3 calls failed! Then failureRate is 100%. Again our circuit breaker will be opened.
+Within HALF OPEN state, limited number of requests will be allowed to pass. In our case it is 3 in the configs the relevant value has been set as **permittedNumberOfCallsInHalfOpenState**: 3.
+Since still rate-service is down, just try loan-service API 3 times again! http://localhost:8000/api/loans?type=personal
+What happened? All 3 calls failed! Then failureRate is 100%. Again our circuit breaker will be opened.
 
 
 
@@ -716,7 +739,9 @@ Since still rate-service is down, just try loan-service API 3 times again! http:
 
 
 After 5 seconds of timeout, again it will become HALF OPEN! Check again using actuator. You should be getting an empty array for loan service API call still…
-Now start the rate-service!!! 😎 Then try this API 3 times again: http://localhost:8000/api/loans?type=personal..What happened? You should get the actual result now! And what about the actuator results? See…Now circuit breaker is CLOSED! 😍 Because expected limited API calls count is successfully executed.
+Now start the rate-service!!! 😎 Then try this API 3 times again: http://localhost:8000/api/loans?type=personal
+What happened?
+You should get the actual result now! And what about the actuator results? See…Now circuit breaker is CLOSED! 😍 Because expected limited API calls count is successfully executed.
 
 
 
