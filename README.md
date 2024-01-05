@@ -128,9 +128,9 @@ Loan service can fetch Loans saved in DB and each loan object has loan type. The
 
 I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
 
-https://github.com/SalithaUCSC/spring-boot-circuit-breaker/blob/main/rate-service/pom.xml
 
 Controller:
+````shell
 
 @RestController
 @RequestMapping("api")
@@ -144,7 +144,10 @@ public class RateController {
         return ResponseEntity.ok().body(rateService.getRateByType(type));
     }
 }
+
+```
 Service:
+````shell
 
 @Service
 public class RateService {
@@ -156,8 +159,10 @@ public class RateService {
         return repository.findByType(type).orElseThrow(() -> new RuntimeException("Rate Not Found: " + type));
     }
 }
+```
 Repository:
 
+````shell
 @Repository
 public interface RateRepository extends JpaRepository<Rate, Integer> {
     Optional<Rate> findByType(String type);
@@ -179,7 +184,10 @@ public class Rate {
     @Column(name = "rate")
     Double rateValue;
 }
+
+```
 Configuration:
+````shell
 
 server:
   port: 9000
@@ -198,8 +206,9 @@ spring:
   h2:
     console:
       enabled: true
+```
 Entry Point: Main class will add 2 types of loan rates when service is coming up.
-
+````shell
 @SpringBootApplication
 public class RateServiceApplication {
 
@@ -218,6 +227,7 @@ public class RateServiceApplication {
       ));
    }
 }
+```
 Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
 
 {"id": 1,"type": "PERSONAL","rateValue": 10}
@@ -228,7 +238,7 @@ Then I will update all the Loan objects with the interest amount using the rate 
 
 Since rate-service is independent, I will first implement basic functionalities for the rate-service.
 
-Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
+Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as rate-service.
 
 ## Rate Service
 
