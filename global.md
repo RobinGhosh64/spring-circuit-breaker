@@ -106,7 +106,7 @@ Keeping it as simple as possible, let’s derive the previous classes from the R
 
 
 Our own classes:
-
+StudentNotFoundException
 
 ````shell
 
@@ -114,6 +114,18 @@ package com.ffx.springboot_mongodb.exception;
 
 public class StudentNotFoundException extends RuntimeException{
     public StudentNotFoundException(String message){
+        super(message);
+    }
+}
+
+````
+StudentAlreadyExistsException
+````shell
+
+package com.ffx.springboot_mongodb.exception;
+
+public class StudentAlreadyExistsException extends RuntimeException{
+    public StudentAlreadyExistsException(String message){
         super(message);
     }
 }
@@ -231,10 +243,4 @@ Response:
 
 In this article, I tried to explain the GlobalExceptionHandler mechanism within the framework of basic principles. Integrating this structure into your projects at the initial stage will facilitate your work in the future and simplify exception-error management. It will also prevent unnecessary codes and ambiguity in Controller and Service layers.
 
-You can access the source codes from the Springboot_mongodb project in the link below, via the globalexceptionhandler branch:
 
-(git checkout globalexceptionhandler)
-
-(“global exception handler added” you can follow with this commit message)
-
-Enjoy Your Work.
