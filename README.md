@@ -6,9 +6,19 @@
 - [Requirements](#requirements)
 - [What is a circuit breaker pattern](#what-is-a-circuit-breaker-pattern)
 - [Step 2: Create an Azure Resource Group ](#step-2-create-an-azure-resource-group)
-- [Step 3: Create Cosmos DB resources](#step-3-create-cosmos-db-resources)
-- [Step 4: Create Function App](#step-4-create-function-app)
+- [How the pattern works?](#how-the-pattern-works?)
+- [Life Cycle of Pattern States](#life-cycle-of-pattern-states)
+- [Pattern states](#pattern-states)
+- [What is Resilience4j](#what-is-resiliency4j)
+- [Create 2 Micro Services ](#create-2-micro-services)
+- [Rate Service](#rate-service)
+- [Loan Service](#loan-service)
 
+
+- [Loan Service calls Rate Service](#loan-service-calls-rate-service)
+- [Normal conditions](#normal-conditions)
+- [Break conditions](#break-conditions)
+- 
 <!-- TOC -->
 
 ## Objectives 
@@ -66,12 +76,12 @@ This pattern comes into the picture while communicating between services. Let’
 
 In such scenarios, we can use this Circuit Breaker pattern to solve the problem. It is giving us a way to handle the situation without bothering the end user or application resources.
 
-How the pattern works? 💥
+## How the pattern works? 💥
 Basically, it will behave same as an electrical circuit breaker. When the application gets remote service call failures more than a given threshold circuit breaker trips for a particular time period. After this timeout expires, the circuit breaker allows a limited number of requests to go through it. If those requests are getting succeeded, then circuit breaker will be closed and normal operations are resumed. Otherwise, it they are failing, timeout period starts again and do the rest as previous.
 
 Let’s figure out this using the upcoming example scenario that I’m going to explain. 😎
 
-Life Cycle of Pattern States 💥
+## Life Cycle of Pattern States 💥
 There are 3 main states discussed in Circuit Breaker pattern. They are:
 
 CLOSED
@@ -89,10 +99,10 @@ HALF OPEN State
 After staying at OPEN state for a given timeout period, breaker automatically turns its state into HALF OPEN state. In this state, only a LIMITED number of remote API calls are allowed to pass through. If the failing calls count is greater than this limited number, breaker turns again into OPEN state. Otherwise it is CLOSED.
 
 
-Pattern states
+## Pattern states
 To demonstrate the pattern practically, I will use Spring Boot framework to create the micro services. Resilience4j library is used to implement the circuit breaker.
 
-What is Resilience4j?
+## What is Resilience4j?
 Resilience4j is a lightweight, easy-to-use fault tolerance library inspired by
 Netflix Hystrix. It provides various features.
 
@@ -106,7 +116,7 @@ We are going to use the very first feature with Spring Boot in this article. �
 
 Let’s start!!
 
-Create 2️⃣ Micro Services
+## Create 2️⃣ Micro Services
 I’m going to implement a simple inter service communication scenario using two services called loan-service and rate-service.
 
 Technical details:
@@ -124,8 +134,11 @@ Since rate-service is independent, I will first implement basic functionalities 
 
 Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
 
+## Rate Service
+
+## Loan Service
+
 https://github.com/iRobinGhosh64/spring-boot-circuit-breaker/
 
 
->>>>>>> 6134ca3 (Initial draft)
 
