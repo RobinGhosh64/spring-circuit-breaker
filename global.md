@@ -6,6 +6,14 @@ When an exception occurs, the Spring Boot application will redirect it to the Gl
 
 We will continue explaining the topic using a project we have previously written. We will integrate this mechanism into the mentioned project. Below you can see the StudentController class:
 
+
+
+
+Controller:
+
+
+````shell
+
 package com.aedemirsen.springboot_mongodb.controller;
 
 import com.aedemirsen.springboot_mongodb.dto.StudentDto;
@@ -44,7 +52,17 @@ public class StudentController {
         return ResponseEntity.ok(insertedStudentDto);
     }
 }
+
+````
+
+
 Lets see StudentService class:
+
+
+
+
+
+````shell
 
 package com.aedemirsen.springboot_mongodb.service.impl;
 
@@ -73,6 +91,11 @@ public class StudentService implements IStudentService {
         return studentRepository.insert(student);
     }
 }
+
+````
+
+
+
 As we can see from the above classes, there are some mechanisms missing to catch and handle possible errors. Let’s create our own Exception classes below and use them in the above classes to manage potential errors:
 
 StudentNotFoundException
