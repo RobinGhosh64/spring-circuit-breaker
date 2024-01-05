@@ -61,12 +61,6 @@ When you finish, you can check your results against the code in gs-cloud-circuit
 ## Requirements
 
 This example assumes the user already has a good working knowledge with Java and Maven.
-Azure subscription with contributor access. Additionally, the following services will be required during the lab: 
-- Azure CLI, [How to install Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-- Git Bash, [Git Download for Windows](https://gitforwindows.org/)
-
-
-
 
 Micro services are the most important implementation aspect used in the industry now. With the use of micro service architecture, developers could eliminate so many issues they had previously with monolithic applications. Moving forward, people started to search and adopt various patterns into the micro services. Most of the times, new pattern was originated to address a common issue seen in another pattern. In this way, a lot of patterns came into the practice with evolution of time. You can get a whole summary from here: https://microservices.io/patterns/microservices.html
 
@@ -92,13 +86,13 @@ OPEN
 HALF OPEN
 Let’s understand the states briefly….
 
-CLOSED State
+**CLOSED State**
 When both services which are interacting are up and running, circuit breaker is CLOSED. Circuit breaker is counting the number of remote API calls continuously.
 
-OPEN State
+**OPEN State**
 As soon as the percentage of failing remote API calls is exceeding the given threshold, circuit breaker changes its state to OPEN state. Calling micro service will fail immediately, and an exception will be returned. That means, the flow is interrupted.
 
-HALF OPEN State
+**HALF OPEN State**
 After staying at OPEN state for a given timeout period, breaker automatically turns its state into HALF OPEN state. In this state, only a LIMITED number of remote API calls are allowed to pass through. If the failing calls count is greater than this limited number, breaker turns again into OPEN state. Otherwise it is CLOSED.
 
 <img src="media/half-open.png">
