@@ -48,9 +48,10 @@ To start from scratch, move on to Starting with Spring Initializr.
 
 To skip the basics, do the following:
 
-Download and unzip the source repository for this guide, or clone it using Git: git clone https://github.com/spring-guides/gs-cloud-circuit-breaker.git
+Download and unzip the source repository for this guide, or clone it using Git: git clone 
+https://github.com/RobinGhosh64/spring-circuit-breaker.git
 
-cd into gs-cloud-circuit-breaker/initial
+cd into spring-circuit-breaker/
 
 Jump ahead to Set up a Server Microservice Application.
 
