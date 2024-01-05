@@ -98,14 +98,14 @@ public class StudentService implements IStudentService {
 
 As we can see from the above classes, there are some mechanisms missing to catch and handle possible errors. Let’s create our own Exception classes below and use them in the above classes to manage potential errors:
 
-StudentNotFoundException
-StudentAlreadyExistsException
+**StudentNotFoundException**
+**StudentAlreadyExistsException**
 Keeping it as simple as possible, let’s derive the previous classes from the RunTimeException class:
 
 
 
 
-Controller:
+Our own classes:
 
 
 ````shell
