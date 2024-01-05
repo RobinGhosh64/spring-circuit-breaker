@@ -102,6 +102,14 @@ StudentNotFoundException
 StudentAlreadyExistsException
 Keeping it as simple as possible, let’s derive the previous classes from the RunTimeException class:
 
+
+
+
+Controller:
+
+
+````shell
+
 package com.ffx.springboot_mongodb.exception;
 
 public class StudentNotFoundException extends RuntimeException{
@@ -109,23 +117,33 @@ public class StudentNotFoundException extends RuntimeException{
         super(message);
     }
 }
-package com.ffx.springboot_mongodb.exception;
 
-public class StudentAlreadyExistsException extends RuntimeException{
-    public StudentAlreadyExistsException(String message){
-        super(message);
-    }
-}
+````
+
 Let’s update the findStudentById method in the Service class as follows:
+
+
+````shell
+
+
 
 @Override
 public Student findStudentById(String id) {
     return studentRepository.findById(id)
             .orElseThrow(() -> new StudentNotFoundException("Student not found with the given ID."));
 }
+
+
+````
+
 With this update, we have made it possible to throw a relevant exception instead of returning null if no student is found in the searched id.
 
+
 Now let’s update the insertStudent method as follows:
+
+````shell
+
+
 
 @Override
 public Student insertStudent(Student student) {
@@ -135,9 +153,17 @@ public Student insertStudent(Student student) {
     }
     return studentRepository.insert(student);
 }
+
+
+````
+
 With this update, we first check whether a record has been made in the database with the ID of the student to be registered. If there is already a student with this id, we throw StudentAlreadyExistsException. If not, the database is registered.
 
 After these changes, we need to make some changes in the StudentController class.
+
+````shell
+
+
 
 @GetMapping("/student/id/{id}")
 public ResponseEntity<StudentDto> findStudentById(@PathVariable String id) {
@@ -145,6 +171,10 @@ public ResponseEntity<StudentDto> findStudentById(@PathVariable String id) {
     var foundStudent = studentMapper.fromStudent(student);
     return ResponseEntity.ok(foundStudent);
 }
+
+
+````
+
 Above, we no longer need to check if the variable student is null. Because if it is null, an exception will be thrown in the service layer anyway. In this way, we have also reduced the complexity and code clutter in the controller class.
 
 Yep, we’re done here. So where do these thrown exceptions go now? If we run our service in this way, the thrown errors will disrupt the flow of the program and return undesirable results to the client.
