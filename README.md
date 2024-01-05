@@ -115,10 +115,10 @@ Let’s start!!
 ## Create 2️⃣ Micro Services
 I’m going to implement a simple inter service communication scenario using two services called loan-service and rate-service.
 
-Technical details:
+**Technical details:**
 Spring Boot with H2 in-memory DB, JPA, Hibernate, Actuator, Resilience4j
 
-Scenario:
+**Scenario:**
 Loan service can fetch Loans saved in DB and each loan object has loan type. There are separate interest rate percentages according to the loan type. So, Rate service is having those Rate object details with it’s name.
 
 
@@ -132,7 +132,10 @@ I will make a call to Rate service from Loan service requesting the interest rat
 
 ## Rate Service
 
-Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
+Since rate-service is independent, I will first implement basic functionalities for the rate-service.
+Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as rate-service.
+
+https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml
 Controller:
 
 
