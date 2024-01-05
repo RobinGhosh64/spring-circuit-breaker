@@ -15,50 +15,56 @@
 - [Enable Circuit Breaker with fallback method](#enable-circuit-breaker-with-fallback-method)
 - [Add Circuit Breaker Configs](#add-circuit-breaker-configs)
   
-<!-- TOC -->
 
-Enable Circuit Breaker with fallback method
 ## Objectives 
 
-Azure Serverless offerings provide a wide array of capabilites to drive modern application architectures with zero-infrastructure and capital investments. This lab demonstrates Azure PaaS offerings including: 
 
-- Azure Event Grid
-- Azure Function Apps 
-- Azure Cosmos DB 
-- Azure infrastructure services to include resource groups, storage accounts and familiarization with Azure CLI services
+This guide walks you through the process of applying circuit breakers to potentially-failing method calls using Spring Cloud Circuit Breaker.
 
-**NOTE: This exercise is a section of a day-long presentation on Azure App Innovation, the complete workshop may be found [here](https://aka.ms/azuredevdaylabs).**
+**What you will build**: 
+You will build a microservice applications that uses the Circuit Breaker pattern to gracefully degrade functionality when a method call fails. Use of the Circuit Breaker pattern can allow a microservice to continue operating when a related service fails, preventing the failure from cascading and giving the failing service time to recover.
+
+**What You Need**
+About 30 minutes
+
+A favorite text editor or IDE
+
+Java 17 or later
+
+Gradle 7.5+ or Maven 3.5+
+
+You can also import the code straight into your IDE:
+
+Spring Tool Suite (STS)
+
+IntelliJ IDEA
+
+VSCode
+
+## How to complete this guide
+Like most Spring Getting Started guides, you can start from scratch and complete each step or you can bypass basic setup steps that are already familiar to you. Either way, you end up with working code.
+
+To start from scratch, move on to Starting with Spring Initializr.
+
+To skip the basics, do the following:
+
+Download and unzip the source repository for this guide, or clone it using Git: git clone https://github.com/spring-guides/gs-cloud-circuit-breaker.git
+
+cd into gs-cloud-circuit-breaker/initial
+
+Jump ahead to Set up a Server Microservice Application.
+
+When you finish, you can check your results against the code in gs-cloud-circuit-breaker/complete.
+
+
 
 ## Requirements
 
-This example assumes the user already has an Azure subscription with contributor access. Additionally, the following services will be required during the lab: 
-
+This example assumes the user already has a good working knowledge with Java and Maven.
+Azure subscription with contributor access. Additionally, the following services will be required during the lab: 
 - Azure CLI, [How to install Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
 - Git Bash, [Git Download for Windows](https://gitforwindows.org/)
 
-## Step 1: Setup Azure subscription and make sure you can  sign in 
-
-Initial login and subscription setup is a required prerequisite
-
-
-NOTE: The region location of the Resource Group may be different than the Azure resources 
-
-## Step 2: Create an Azure Resource Group 
-
-  Navigate to the **Resource Groups** from the top main search bar. Select **Create** to create a New Resource Group
-  
-  Fill all paramters as shown:
-  
-- Subscription: **your-subscription-name**
-- Resource Name: **devdayfeb-rsg** 
-- Region: **East US** 
-
-
-Click on **Review + create** and then confirm final creation
-
- <img src="media/devday-create-resource.png">
- 
-  
 
 
 
