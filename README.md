@@ -5,7 +5,6 @@
 
 - [Requirements](#requirements)
 - [What is a circuit breaker pattern](#what-is-a-circuit-breaker-pattern)
-- [Step 2: Create an Azure Resource Group ](#step-2-create-an-azure-resource-group)
 - [How the pattern works?](#how-the-pattern-works?)
 - [Life Cycle of Pattern States](#life-cycle-of-pattern-states)
 - [Pattern states](#pattern-states)
