@@ -1,9 +1,64 @@
-<<<<<<< HEAD
-# spring-circuit-breaker
-Circuit Breaker Code demonstrating a simple Bank Use Case
-=======
-# spring-boot-circuit-breaker
-Spring Boot Circuit Breaker
+# Circuit Breaker Usage - One service calling another service
+
+<!-- TOC -->
+**Overview**: 
+
+- [Requirements](#requirements)
+- [Step 1: Setup Azure subscription and properties](#step-1-setup-azure-subscription-and-properties)
+- [Step 2: Create an Azure Resource Group ](#step-2-create-an-azure-resource-group)
+- [Step 3: Create Cosmos DB resources](#step-3-create-cosmos-db-resources)
+- [Step 4: Create Function App](#step-4-create-function-app)
+- [Step 5: Create Storage Account](#step-5-create-storage-account)
+- [Step 6: Ask Azure to wireup events from Blob Storage using Event Grid Topic and call AZ function](#step-6-create-event-grid)
+- [Step 7: Event Grid Blob Storage Test](#step-7-event-grid-blob-storage-test)
+- [Step 8: Azure Cosmos DB Output Binding](#step-8-azure-cosmos-db-output-binding)
+- [Step 9: Azure Cosmos DB Input Binding](#step-9-azure-cosmos-db-input-binding)
+- [Step 10: Clean up resources](#step-10-clean-up-resources)
+- [Bonus Material](#bonus-material)
+
+<!-- TOC -->
+
+## Objectives 
+
+Azure Serverless offerings provide a wide array of capabilites to drive modern application architectures with zero-infrastructure and capital investments. This lab demonstrates Azure PaaS offerings including: 
+
+- Azure Event Grid
+- Azure Function Apps 
+- Azure Cosmos DB 
+- Azure infrastructure services to include resource groups, storage accounts and familiarization with Azure CLI services
+
+**NOTE: This exercise is a section of a day-long presentation on Azure App Innovation, the complete workshop may be found [here](https://aka.ms/azuredevdaylabs).**
+
+## Requirements
+
+This example assumes the user already has an Azure subscription with contributor access. Additionally, the following services will be required during the lab: 
+
+- Azure CLI, [How to install Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+- Git Bash, [Git Download for Windows](https://gitforwindows.org/)
+
+## Step 1: Setup Azure subscription and make sure you can  sign in 
+
+Initial login and subscription setup is a required prerequisite
+
+
+NOTE: The region location of the Resource Group may be different than the Azure resources 
+
+## Step 2: Create an Azure Resource Group 
+
+  Navigate to the **Resource Groups** from the top main search bar. Select **Create** to create a New Resource Group
+  
+  Fill all paramters as shown:
+  
+- Subscription: **your-subscription-name**
+- Resource Name: **devdayfeb-rsg** 
+- Region: **East US** 
+
+
+Click on **Review + create** and then confirm final creation
+
+ <img src="media/devday-create-resource.png">
+ 
+  
 
 
 
