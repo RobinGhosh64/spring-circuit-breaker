@@ -128,178 +128,14 @@ Loan service can fetch Loans saved in DB and each loan object has loan type. The
 
 I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
 
-Controller:
-
-
-````shell
-
-module.exports = async function (context, req) {
-    context.log('JavaScript HTTP trigger function processed a request.');
-
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: context.bindings.inputDocument
-    };
-}
-
-````
-
-
-Controller:
-
-
-````shell
-
-module.exports = async function (context, req) {
-    context.log('JavaScript HTTP trigger function processed a request.');
-
-    context.res = {
-        // status: 200, /* Defaults to 200 */
-        body: context.bindings.inputDocument
-    };
-}
-
-````
-
-
-
-Controller:
-
-
-````shell
-
-@RestController
-@RequestMapping("api")
-public class RateController {
-
-    @Autowired
-    private RateService rateService;
-
-    @GetMapping(path = "/rates/{type}")
-    public ResponseEntity<Rate> getRateByType(@PathVariable("type") String type) {
-        return ResponseEntity.ok().body(rateService.getRateByType(type));
-    }
-}
-
-```
-
-
-Service:
-
-````shell
-
-@Service
-public class RateService {
-
-    @Autowired
-    private RateRepository repository;
-
-    public Rate getRateByType(String type) {
-        return repository.findByType(type).orElseThrow(() -> new RuntimeException("Rate Not Found: " + type));
-    }
-}
-
-```
-
-Repository:
-
-
-````shell
-
-@Repository
-public interface RateRepository extends JpaRepository<Rate, Integer> {
-    Optional<Rate> findByType(String type);
-}
-Entity:
-
-@Builder
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Entity
-@Table(name = "rates")
-public class Rate {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
-    String type;
-    @Column(name = "rate")
-    Double rateValue;
-}
-
-```
-
-
-Configuration:
-
-````shell
-
-server:
-  port: 9000
-spring:
-  application:
-    name: rate-service
-  datasource:
-    url: jdbc:h2:mem:cb-rate-db
-    username: root
-    password: 123
-    driverClassName: org.h2.Driver
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
-    hibernate:
-      ddl-auto: create-drop
-  h2:
-    console:
-      enabled: true
-
-```
-
-Entry Point: Main class will add 2 types of loan rates when service is coming up.
-
-
-````shell
-
-@SpringBootApplication
-public class RateServiceApplication {
-
-   @Autowired
-   private RateRepository rateRepository;
-
-   public static void main(String[] args) {
-      SpringApplication.run(RateServiceApplication.class, args);
-   }
-
-   @PostConstruct
-   public void setupData() {
-      rateRepository.saveAll(Arrays.asList(
-         Rate.builder().id(1).type("PERSONAL").rateValue(10.0).build(),
-         Rate.builder().id(2).type("HOUSING").rateValue(8.0).build()
-      ));
-   }
-}
-
-```
-
-Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
-
-{"id": 1,"type": "PERSONAL","rateValue": 10}
-Then I have to calculate the total interest value for the loans depending on their loan type.
-Then I will update all the Loan objects with the interest amount using the rate I got from Rate service.
-
-<img src="media/project-setup.png">
-
-Since rate-service is independent, I will first implement basic functionalities for the rate-service.
-
-Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as rate-service.
 
 ## Rate Service
 
 Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
-
-https://github.com/SalithaUCSC/spring-boot-circuit-breaker/blob/main/rate-service/pom.xml
-
 Controller:
+
+
+````shell
 
 @RestController
 @RequestMapping("api")
@@ -313,7 +149,14 @@ public class RateController {
         return ResponseEntity.ok().body(rateService.getRateByType(type));
     }
 }
-Service:
+
+````
+
+
+Controller:
+
+
+````shell
 
 @Service
 public class RateService {
@@ -325,7 +168,14 @@ public class RateService {
         return repository.findByType(type).orElseThrow(() -> new RuntimeException("Rate Not Found: " + type));
     }
 }
+
+````
+
 Repository:
+
+
+
+````shell
 
 @Repository
 public interface RateRepository extends JpaRepository<Rate, Integer> {
@@ -348,7 +198,13 @@ public class Rate {
     @Column(name = "rate")
     Double rateValue;
 }
-Configuration:
+
+
+Repository:
+
+
+
+````shell
 
 server:
   port: 9000
@@ -367,7 +223,20 @@ spring:
   h2:
     console:
       enabled: true
+
+
+
+````
+
+
+
+
 Entry Point: Main class will add 2 types of loan rates when service is coming up.
+
+
+
+
+````shell
 
 @SpringBootApplication
 public class RateServiceApplication {
@@ -387,6 +256,22 @@ public class RateServiceApplication {
       ));
    }
 }
+
+
+
+
+````
+
+
+
+Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
+
+{"id": 1,"type": "PERSONAL","rateValue": 10}
+
+Then I have to calculate the total interest value for the loans depending on their loan type.
+Then I will update all the Loan objects with the interest amount using the rate I got from Rate service.
+
+<img src="media/project-setup.png">
 Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
 
 {"id": 1,"type": "PERSONAL","rateValue": 10}
@@ -398,7 +283,6 @@ Now I need to implement loan-service. The circuit breaker is needed inside loan-
 
 Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as loan-service.
 
-https://github.com/SalithaUCSC/spring-boot-circuit-breaker/blob/main/loan-service/pom.xml
 
 Let’s add basic functionalities for the loan-service.
 
