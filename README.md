@@ -98,6 +98,7 @@ As soon as the percentage of failing remote API calls is exceeding the given thr
 HALF OPEN State
 After staying at OPEN state for a given timeout period, breaker automatically turns its state into HALF OPEN state. In this state, only a LIMITED number of remote API calls are allowed to pass through. If the failing calls count is greater than this limited number, breaker turns again into OPEN state. Otherwise it is CLOSED.
 
+<img src="media/half-open.png">
 
 ## Pattern states
 To demonstrate the pattern practically, I will use Spring Boot framework to create the micro services. Resilience4j library is used to implement the circuit breaker.
@@ -129,7 +130,8 @@ I will make a call to Rate service from Loan service requesting the interest rat
 Then I have to calculate the total interest value for the loans depending on their loan type.
 Then I will update all the Loan objects with the interest amount using the rate I got from Rate service.
 
-Project setup
+<img src="media/project-setup.png">
+
 Since rate-service is independent, I will first implement basic functionalities for the rate-service.
 
 Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
