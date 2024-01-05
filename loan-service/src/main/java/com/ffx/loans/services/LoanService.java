@@ -24,7 +24,7 @@ public class LoanService {
 
     private static final String SERVICE_NAME = "loan-service";
 
-    private static final String RATE_SERVICE_URL = "http://localhost:9001/api/rates/";
+    private static final String RATE_SERVICE_URL = "http://localhost:9000/api/rates/";
 
     @CircuitBreaker(name = SERVICE_NAME, fallbackMethod = "getDefaultLoans")
     public List<Loan> getAllLoansByType(String type) {
