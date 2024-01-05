@@ -126,7 +126,101 @@ Spring Boot with H2 in-memory DB, JPA, Hibernate, Actuator, Resilience4j
 Scenario:
 Loan service can fetch Loans saved in DB and each loan object has loan type. There are separate interest rate percentages according to the loan type. So, Rate service is having those Rate object details with it’s name.
 
-I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.
+I will make a call to Rate service from Loan service requesting the interest rate of the given loan type.Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
+
+https://github.com/SalithaUCSC/spring-boot-circuit-breaker/blob/main/rate-service/pom.xml
+
+Controller:
+
+@RestController
+@RequestMapping("api")
+public class RateController {
+
+    @Autowired
+    private RateService rateService;
+
+    @GetMapping(path = "/rates/{type}")
+    public ResponseEntity<Rate> getRateByType(@PathVariable("type") String type) {
+        return ResponseEntity.ok().body(rateService.getRateByType(type));
+    }
+}
+Service:
+
+@Service
+public class RateService {
+
+    @Autowired
+    private RateRepository repository;
+
+    public Rate getRateByType(String type) {
+        return repository.findByType(type).orElseThrow(() -> new RuntimeException("Rate Not Found: " + type));
+    }
+}
+Repository:
+
+@Repository
+public interface RateRepository extends JpaRepository<Rate, Integer> {
+    Optional<Rate> findByType(String type);
+}
+Entity:
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "rates")
+public class Rate {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+    String type;
+    @Column(name = "rate")
+    Double rateValue;
+}
+Configuration:
+
+server:
+  port: 9000
+spring:
+  application:
+    name: rate-service
+  datasource:
+    url: jdbc:h2:mem:cb-rate-db
+    username: root
+    password: 123
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: true
+Entry Point: Main class will add 2 types of loan rates when service is coming up.
+
+@SpringBootApplication
+public class RateServiceApplication {
+
+   @Autowired
+   private RateRepository rateRepository;
+
+   public static void main(String[] args) {
+      SpringApplication.run(RateServiceApplication.class, args);
+   }
+
+   @PostConstruct
+   public void setupData() {
+      rateRepository.saveAll(Arrays.asList(
+         Rate.builder().id(1).type("PERSONAL").rateValue(10.0).build(),
+         Rate.builder().id(2).type("HOUSING").rateValue(8.0).build()
+      ));
+   }
+}
+Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
+
+{"id": 1,"type": "PERSONAL","rateValue": 10}
 Then I have to calculate the total interest value for the loans depending on their loan type.
 Then I will update all the Loan objects with the interest amount using the rate I got from Rate service.
 
@@ -138,9 +232,424 @@ Create a new Spring Boot project with the dependencies provided inside below POM
 
 ## Rate Service
 
+Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as rate-service.
+
+https://github.com/SalithaUCSC/spring-boot-circuit-breaker/blob/main/rate-service/pom.xml
+
+Controller:
+
+@RestController
+@RequestMapping("api")
+public class RateController {
+
+    @Autowired
+    private RateService rateService;
+
+    @GetMapping(path = "/rates/{type}")
+    public ResponseEntity<Rate> getRateByType(@PathVariable("type") String type) {
+        return ResponseEntity.ok().body(rateService.getRateByType(type));
+    }
+}
+Service:
+
+@Service
+public class RateService {
+
+    @Autowired
+    private RateRepository repository;
+
+    public Rate getRateByType(String type) {
+        return repository.findByType(type).orElseThrow(() -> new RuntimeException("Rate Not Found: " + type));
+    }
+}
+Repository:
+
+@Repository
+public interface RateRepository extends JpaRepository<Rate, Integer> {
+    Optional<Rate> findByType(String type);
+}
+Entity:
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "rates")
+public class Rate {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+    String type;
+    @Column(name = "rate")
+    Double rateValue;
+}
+Configuration:
+
+server:
+  port: 9000
+spring:
+  application:
+    name: rate-service
+  datasource:
+    url: jdbc:h2:mem:cb-rate-db
+    username: root
+    password: 123
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: true
+Entry Point: Main class will add 2 types of loan rates when service is coming up.
+
+@SpringBootApplication
+public class RateServiceApplication {
+
+   @Autowired
+   private RateRepository rateRepository;
+
+   public static void main(String[] args) {
+      SpringApplication.run(RateServiceApplication.class, args);
+   }
+
+   @PostConstruct
+   public void setupData() {
+      rateRepository.saveAll(Arrays.asList(
+         Rate.builder().id(1).type("PERSONAL").rateValue(10.0).build(),
+         Rate.builder().id(2).type("HOUSING").rateValue(8.0).build()
+      ));
+   }
+}
+Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
+
+{"id": 1,"type": "PERSONAL","rateValue": 10}
+
+
 ## Loan Service
 
-https://github.com/iRobinGhosh64/spring-boot-circuit-breaker/
+Now I need to implement loan-service. The circuit breaker is needed inside loan-service since it’s calling to rate-service. Therefore, Resilience4j library is needed. And I need to check the status of the breaker. For that, I need Actuator enabled in the loan-service.
+
+Create a new Spring Boot project with the dependencies provided inside below POM file. I have named it as loan-service.
+
+https://github.com/SalithaUCSC/spring-boot-circuit-breaker/blob/main/loan-service/pom.xml
+
+Let’s add basic functionalities for the loan-service.
+
+Controller:
+
+@RestController
+@RequestMapping("api")
+public class LoanController {
+
+    @Autowired
+    private LoanService loanService;
+
+    @GetMapping(path = "/loans")
+    public ResponseEntity<List<Loan>> getLoansByType(@RequestParam("type") String type) {
+        return ResponseEntity.ok().body(loanService.getAllLoansByType(type.toUpperCase()));
+    }
+
+}
+Repository:
+
+public interface LoanRepository extends JpaRepository<Loan, Integer> {
+    List<Loan> findByType(String type);
+}
+DTO: This is used to convert the response coming from rate-service API call. Since it’s in the type of Rate. Same as rate-service Rate entity class(only omitted the ORM related things)
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class InterestRate {
+    Integer id;
+    String type;
+    Double rateValue;
+}
+Entity:
+
+@Builder
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "loans")
+public class Loan {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+    String type;
+    Double amount;
+    Double interest;
+}
+Entry Point:
+
+Main class will add 3 loan objects when service is coming up. Interest amount has been set as zero since we later update it with the remote call to rate-service.
+We need a Bean of RestTemplate class to perform a remote API call. If you do not know about it, please read about it from here: https://salithachathuranga94.medium.com/rest-template-with-spring-boot-e2001a8219e6
+@SpringBootApplication
+public class LoanServiceApplication {
+
+   @Autowired
+   private LoanRepository loanRepository;
+
+   public static void main(String[] args) {
+      SpringApplication.run(LoanServiceApplication.class, args);
+   }
+
+   @Bean
+   public RestTemplate restTemplate() {
+      return new RestTemplate();
+   }
+
+   @PostConstruct
+   public void setupData() {
+      loanRepository.saveAll(Arrays.asList(
+         Loan.builder().id(1).type("PERSONAL").amount(200000.0).interest(0.0).build(),
+         Loan.builder().id(2).type("HOUSING").amount(6000000.0).interest(0.0).build(),
+         Loan.builder().id(3).type("PERSONAL").amount(100000.0).interest(0.0).build()
+      ));
+   }
+}
+Service:
+
+This is the most important place where we perform the remote call. We need to call this API using RestTemplate: http://localhost:9000/api/rates/{type} in rate service to get the % of the loan type. Then we calculate the interest amount as loan amount * (rate/100) and update loan interest amount.
+
+@Service
+public class LoanService {
+    @Autowired
+    private LoanRepository loanRepository;
+    @Autowired
+    private RestTemplate restTemplate;
+    private static final String SERVICE_NAME = "loan-service";
+    private static final String RATE_SERVICE_URL = "http://localhost:9000/api/rates/";
+    public List<Loan> getAllLoansByType(String type) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<InterestRate> entity = new HttpEntity<>(null, headers);
+        ResponseEntity<InterestRate> response = restTemplate.exchange(
+            (RATE_SERVICE_URL + type),
+            HttpMethod.GET, entity,
+            InterestRate.class
+        );
+        InterestRate rate = response.getBody();
+        List<Loan> loanList = new ArrayList<>();
+        if (rate != null) {
+            loanList = loanRepository.findByType(type);
+            for (Loan loan : loanList) {
+                loan.setInterest(loan.getAmount() * (rate.getRateValue() / 100));
+            }
+        }
+        return loanList;
+    }
+}
+Configuration:
+
+server:
+  port: 8000
+spring:
+  application:
+    name: loan-service
+  datasource:
+    url: jdbc:h2:mem:cb-loan-db
+    username: root
+    password: 123
+    driverClassName: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+  h2:
+    console:
+      enabled: true
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health
+  health:
+    circuitbreakers:
+      enabled: true
+🔴 I have only allowed actuator to display circuit breaker details. Later we will add the circuit breaker configuration here. For now, it’s not needed.
+
+Now we can start rate-service and see check the API we need. Go to http://localhost:8000/api/loans?type=personal and see the result. You should get this response.
+
+[
+{"id": 1,"type": "PERSONAL","amount": 200000,"interest": 20000},    {"id": 3,"type": "PERSONAL","amount": 100000,"interest": 10000}
+]
+Enable Circuit Breaker with fallback method 💥
+Now we have to enrich our Loan service method with an annotation. It is called “@CircuitBreaker”. Here, SERVICE_NAME is taken as “loan-service”. Then we have to provide a fallbackMethod. The purpose of that is to call it by default when the downstream service(rate-service) is failing to respond.
+
+@CircuitBreaker(name = SERVICE_NAME, fallbackMethod = "getDefaultLoans")
+public List<Loan> getAllLoansByType(String type) {
+         ...............
+}
+I have setup the method to return an empty List by default when rate service is not responding.
+
+🔴 You can setup this method to show an error message also without sending an empty message. You can return something like this — “Rate service is not responding. Request failed!”. Sending empty array or a default set of data is not the ideal way. Because it will make a confusion to the users. But you MUST make sure that both methods are returning the same type of data. In my case: both methods are returning Lists!
+
+public List<Loan> getDefaultLoans(Exception e) {
+    return new ArrayList<>();
+}
+Add Circuit Breaker Configs 💥
+Let’s add Resilience4j circuit breaker configurations. Add this to application.yml in loan-service.
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      loan-service:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+failureRateThreshold—Expected percentage of the failure threshold.
+I have set it as 50%. It means, when total failed remote calls % is equal or greater than 50%, breaker will be active to stop furthermore requests.
+minimumNumberOfCalls — Minimum number of total API calls to decide failure percentage to enable the breaker.
+I have set it as 5. Let’s say 3 API calls are failing from the the first 5 API calls. It means failureRateThreshold = (3/5) * 100 = 60%.
+automaticTransitionFromOpenToHalfOpenEnabled — I have set this as true. It will automatically transfer OPEN state to HALF OPEN state when it comes the right time for that transition.
+waitDurationInOpenState — Timeout period before going to HALF OPEN state from OPEN state. After 5 seconds, breaker will change the state, here.
+permittedNumberOfCallsInHalfOpenState — Number of LIMITED API calls that should be sent while in HALF OPEN state. I have set it as 3. So, after 3 API calls, if they are failed, then breaker will again go to OPEN state. Otherwise breaker will be CLOSED since rate-service is UP.
+slidingWindowType: Here I have set the type to keep the circuit breaker behavior based on the requests counts.
+Start both services. Now go to loan service actuator URL and see how circuit breaker is shown there: http://localhost:8000/actuator/health. Circuit breaker details has been highlighted in the response.
+
+{
+  "status": "UP",
+  "components": {
+    "circuitBreakers": {
+      "status": "UP",
+      "details": {
+        "loan-service": {
+          "status": "UP",
+          "details": {
+            "failureRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "-1.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 1,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+          }
+        }
+      }
+    },
+   ......................................
+  }
+}
+bufferedCalls —Total API calls from loan-service to rate-service
+failedCalls — Total count of failed API calls from loan-service to rate-service
+failureRate — (failedCalls/bufferedCalls) * 100%
+Test Circuit Breaker 💥
+We have to follow some ordered steps to see the changes exactly. In each step, we have to see the actuator endpoint and see how circuit breaker is behaving by changing its state. Let’s start!!! 💪
+
+Start both micro services. Loan service is running on 8000 and Rate service is running on 9000. Am i right???
+Now hit this API 2 times: http://localhost:8000/api/loans?type=personal. Then go and check the actuator: http://localhost:8000/actuator/health. Now bufferedCalls count has been updated into 2 as expected. Still breaker is CLOSED since rate service is UP.
+{
+    "loan-service": {
+        "status": "UP",
+        "details": {
+            "failureRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "-1.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 2,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+        }
+    }
+}
+Now STOP the rate-service!! Then hit loan service API URL 3 times: http://localhost:8000/api/loans?type=personal. You should get an empty array we setup as fallback! This will lead bufferedCalls count to 5(Previous 2 and this 3). Right? At the same time, failedCalls count is updated into 3. Right?? Now failureRate becomes 60%( (3/5) * 100% ). Then it has exceeded our threshold: 50%. 😅 Then the circuit breaker changes its state to OPEN! 😍
+{
+    "loan-service": {
+        "status": "CIRCUIT_OPEN",
+        "details": {
+            "failureRate": "60.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "0.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 5,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 3,
+            "notPermittedCalls": 0,
+            "state": "OPEN"
+        }
+    }
+}
+Then wait for 5 seconds. It should then convert into HALF OPEN state after 5 seconds right? According to our configurations we have set waitDurationInOpenState to 5s…This is the timeout period…After this time period, request counts also will be reset.
+{
+    "loan-service": {
+        "status": "CIRCUIT_HALF_OPEN",
+        "details": {
+            "failureRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "-1.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 0,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "HALF_OPEN"
+        }
+    }
+}
+Within HALF OPEN state, limited number of requests will be allowed to pass. In our case it is 3 in the configs the relevant value has been set as permittedNumberOfCallsInHalfOpenState: 3.
+Since still rate-service is down, just try loan-service API 3 times again! http://localhost:8000/api/loans?type=personal…What happened? All 3 calls failed! Then failureRate is 100%. Again our circuit breaker will be opened.
+{
+    "loan-service": {
+        "status": "CIRCUIT_OPEN",
+        "details": {
+            "failureRate": "100.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "0.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 3,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 3,
+            "notPermittedCalls": 0,
+            "state": "OPEN"
+        }
+    }
+}
+After 5 seconds of timeout, again it will become HALF OPEN! Check again using actuator. You should be getting an empty array for loan service API call still…
+Now start the rate-service!!! 😎 Then try this API 3 times again: http://localhost:8000/api/loans?type=personal..What happened? You should get the actual result now! And what about the actuator results? See…Now circuit breaker is CLOSED! 😍 Because expected limited API calls count is successfully executed.
+{
+    "loan-service": {
+        "status": "UP",
+        "details": {
+            "failureRate": "-1.0%",
+            "failureRateThreshold": "50.0%",
+            "slowCallRate": "-1.0%",
+            "slowCallRateThreshold": "100.0%",
+            "bufferedCalls": 0,
+            "slowCalls": 0,
+            "slowFailedCalls": 0,
+            "failedCalls": 0,
+            "notPermittedCalls": 0,
+            "state": "CLOSED"
+        }
+    }
+}
+Now we practically saw how breaker is behaving right? Isn’t amazing?? 😎 It is working as expected guys!!!
+
+
 
 
 
