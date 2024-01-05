@@ -354,7 +354,17 @@ Repository:
 public interface LoanRepository extends JpaRepository<Loan, Integer> {
     List<Loan> findByType(String type);
 }
+
+
+
+````
+
+
 DTO: This is used to convert the response coming from rate-service API call. Since it’s in the type of Rate. Same as rate-service Rate entity class(only omitted the ORM related things)
+
+
+````shell
+
 
 @Data
 @AllArgsConstructor
@@ -364,7 +374,13 @@ public class InterestRate {
     String type;
     Double rateValue;
 }
+
+````
+
 Entity:
+
+````shell
+
 
 @Builder
 @Getter
@@ -424,49 +440,16 @@ management:
 
 
 
-Entry Point: Main class will add 2 types of loan rates when service is coming up.
-
-
-
-
-````shell
-
-@SpringBootApplication
-public class RateServiceApplication {
-
-   @Autowired
-   private RateRepository rateRepository;
-
-   public static void main(String[] args) {
-      SpringApplication.run(RateServiceApplication.class, args);
-   }
-
-   @PostConstruct
-   public void setupData() {
-      rateRepository.saveAll(Arrays.asList(
-         Rate.builder().id(1).type("PERSONAL").rateValue(10.0).build(),
-         Rate.builder().id(2).type("HOUSING").rateValue(8.0).build()
-      ));
-   }
-}
-
-
-
-
-````
-
-
-
 
 Entry Point:
-
+Main class will add 3 loan objects when service is coming up. Interest amount has been set as zero since we later update it with the remote call to rate-service.
+We need a Bean of RestTemplate class to perform a remote API call. 
 
 
 
 ````shell
 
-Main class will add 3 loan objects when service is coming up. Interest amount has been set as zero since we later update it with the remote call to rate-service.
-We need a Bean of RestTemplate class to perform a remote API call. If you do not know about it, please read about it from here: https://salithachathuranga94.medium.com/rest-template-with-spring-boot-e2001a8219e6
+
 @SpringBootApplication
 public class LoanServiceApplication {
 
