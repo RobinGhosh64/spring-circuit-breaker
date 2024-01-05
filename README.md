@@ -144,7 +144,8 @@ module.exports = async function (context, req) {
 
 ````
 
-RestController
+Controller:
+
 
 ````shell
 
@@ -160,7 +161,9 @@ public class RateController {
         return ResponseEntity.ok().body(rateService.getRateByType(type));
     }
 }
+
 ```
+
 
 Service:
 
@@ -176,11 +179,14 @@ public class RateService {
         return repository.findByType(type).orElseThrow(() -> new RuntimeException("Rate Not Found: " + type));
     }
 }
+
 ```
 
 Repository:
 
+
 ````shell
+
 @Repository
 public interface RateRepository extends JpaRepository<Rate, Integer> {
     Optional<Rate> findByType(String type);
@@ -202,9 +208,12 @@ public class Rate {
     @Column(name = "rate")
     Double rateValue;
 }
+
 ```
 
+
 Configuration:
+
 ````shell
 
 server:
@@ -224,9 +233,14 @@ spring:
   h2:
     console:
       enabled: true
+
 ```
+
 Entry Point: Main class will add 2 types of loan rates when service is coming up.
+
+
 ````shell
+
 @SpringBootApplication
 public class RateServiceApplication {
 
@@ -245,7 +259,9 @@ public class RateServiceApplication {
       ));
    }
 }
+
 ```
+
 Now we can start rate-service and see check the API we need. Go to http://localhost:9000/api/rates/PERSONAL and see the result. You should get this response.
 
 {"id": 1,"type": "PERSONAL","rateValue": 10}
