@@ -12,9 +12,12 @@
 - [Create 2 Micro Services ](#create-2-micro-services)
 - [Rate Service](#rate-service)
 - [Loan Service](#loan-service)
-
+- [Enable Circuit Breaker with fallback method](#enable-circuit-breaker-with-fallback-method)
+- [Add Circuit Breaker Configs](#add-circuit-breaker-configs)
+  
 <!-- TOC -->
 
+Enable Circuit Breaker with fallback method
 ## Objectives 
 
 Azure Serverless offerings provide a wide array of capabilites to drive modern application architectures with zero-infrastructure and capital investments. This lab demonstrates Azure PaaS offerings including: 
@@ -134,7 +137,7 @@ I will make a call to Rate service from Loan service requesting the interest rat
 Since rate-service is independent, I will first implement basic functionalities for the rate-service.
 Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as rate-service.
 
-https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml](https://github.com/RobinGhosh64/spring-circuit-breaker/blob/main/rate-service/pom.xml
+https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml
 
 
 Controller:
@@ -290,8 +293,7 @@ Now I need to implement loan-service. The circuit breaker is needed inside loan-
 
 Create a new Spring Boot project with the dependencies provided in the POM file. I have named it as loan-service.
 
-https://github.com/RobinGhosh64/spring-circuit-breaker/rate-service/pom.xml](https://github.com/RobinGhosh64/spring-circuit-breaker/blob/main/rate-service/pom.xml
-
+https://github.com/RobinGhosh64/spring-circuit-breaker/loan-service/pom.xml
 
 Let’s add basic functionalities for the loan-service.
 
