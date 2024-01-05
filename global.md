@@ -102,14 +102,14 @@ StudentNotFoundException
 StudentAlreadyExistsException
 Keeping it as simple as possible, let’s derive the previous classes from the RunTimeException class:
 
-package com.aedemirsen.springboot_mongodb.exception;
+package com.ffx.springboot_mongodb.exception;
 
 public class StudentNotFoundException extends RuntimeException{
     public StudentNotFoundException(String message){
         super(message);
     }
 }
-package com.aedemirsen.springboot_mongodb.exception;
+package com.ffx.springboot_mongodb.exception;
 
 public class StudentAlreadyExistsException extends RuntimeException{
     public StudentAlreadyExistsException(String message){
@@ -206,9 +206,5 @@ You can access the source codes from the Springboot_mongodb project in the link 
 (git checkout globalexceptionhandler)
 
 (“global exception handler added” you can follow with this commit message)
-
-training/Springboot_mongodb at main · aedemirsen/training
-training studies and projects. Contribute to aedemirsen/training development by creating an account on GitHub.
-github.com
 
 Enjoy Your Work.
